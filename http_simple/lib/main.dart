@@ -37,7 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void getHttp() async {
     try{
-      final response = await dio.get('https://fourn6-mobile-prof.onrenderr.com/exos/long/double/4');
+      final response = await dio.get('https://fourn6-mobile-prof.onrender.com/exos/long/double/4');
       print(response);
       this.response = response.data;
       setState(() {});
