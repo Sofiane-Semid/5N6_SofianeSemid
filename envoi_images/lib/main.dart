@@ -1,4 +1,8 @@
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -15,56 +19,90 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home:  MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
 
-  final String title;
+
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  List<XFile> pickedImages = [];
+  List<String> imageUrls = [];
 
-  void _incrementCounter() {
-    setState(() {
+  void getImages() async {
+    ImagePicker picker = ImagePicker();
 
-      _counter++;
-    });
+    pickedImages = await picker.pickMultiImage();
+
+    setState(() {});
+  }
+
+  void sendImages() async {
+    imageUrls.clear();
+
+    Dio dio = Dio();
+
+    for (XFile image in pickedImages) {
+      FormData formData = FormData.fromMap({
+        "file": await MultipartFile.fromFile(
+          image.path,
+          filename: image.name,
+        ),
+      });
+
+      var response = await dio.post(
+        "http://10.0.2.2:8080/singleFile",
+        data: formData,
+      );
+
+      String id = response.data as String;
+
+      String url = "http://10.0.2.2:8080/singleFile" + id;
+
+      imageUrls.add(url);
+    }
+
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: Text("Image Picker"),
       ),
-      body: Center(
+      body: Column(
+        children: [
+          ElevatedButton(
+            onPressed: sendImages,
+            child: const Text("Envoyer les images"),
+          ),
 
-        child: Column(
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+          Text("${pickedImages.length} image(s) sélectionnée(s)"),
+
+          Expanded(
+            child: ListView.builder(
+              itemCount: imageUrls.length,
+              itemBuilder: (context, index) {
+                return Image.network(imageUrls[index]);
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        onPressed: getImages,
+        child: const Icon(Icons.image),
       ),
+
     );
   }
 }
