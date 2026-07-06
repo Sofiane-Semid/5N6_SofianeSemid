@@ -1,6 +1,17 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+import 'Jeu.dart';
+import 'firebase_options.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(const MyApp());
 }
 
@@ -30,6 +41,31 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   @override
+  void initState(){
+    initFirebase();
+  }
+
+  void initFirebase() async{
+    await Firebase.initializeApp();
+  }
+
+  void addGame() async{
+    CollectionReference jeuxCollection = FirebaseFirestore.instance.collection('jeux');
+    jeuxCollection.add({
+      'Nom' : 'Gta 3',
+      'Ventes' : 500
+    });
+  }
+
+  var jeuDocs;
+  void getGame() async{
+    CollectionReference jeuxCollection = FirebaseFirestore.instance.collection('Jeux');
+    var resultats = await jeuxCollection.get();
+    jeuDocs = resultats.docs;
+
+    setState((){});
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -40,6 +76,27 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: .center,
           children: [
+            ElevatedButton(onPressed: addGame, child: Text('add game')),
+            ElevatedButton(onPressed: getGame, child: Text('get game')),
+
+            Expanded(
+                child: ListView(
+                    children:
+                    (jeuDocs != null)?
+                    jeuDocs.map<Widget>((j) => ElevatedButton(
+                      child: Text(j['Nom']),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailJeuPage(nom: j['Nom'], ventes: j['Ventes'],),
+                          ),
+                        );
+                      },
+                    )).toList()
+                        : [Text('rien')]
+                )
+            )
 
 
           ],
