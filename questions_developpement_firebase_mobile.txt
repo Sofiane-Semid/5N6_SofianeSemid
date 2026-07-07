@@ -1,0 +1,428 @@
+BANQUE DE QUESTIONS À DÉVELOPPEMENT — 5N6 APPLICATIONS MOBILES AVANCÉES
+Format conseillé pour l'examen : répondre en 2 à 4 lignes, avec les mots-clés importants.
+Sujets : Firebase Auth, Firestore, contrôle d'accès, Storage, Streams, règles Firebase, Hero, HTTP JSON et erreurs.
+
+====================================================================
+1. FIREBASE AUTHENTICATION
+====================================================================
+
+Q1. Qu'est-ce que Firebase Authentication ?
+R. Firebase Authentication est un service qui permet d'identifier un utilisateur dans l'application. Il peut gérer la connexion par courriel/mot de passe, Google ou d'autres fournisseurs. Une fois connecté, l'utilisateur possède un uid unique utilisé pour sécuriser ses données.
+
+Q2. Pourquoi utilise-t-on Firebase Authentication dans une application mobile ?
+R. On l'utilise pour savoir qui est connecté et pour associer les données à un utilisateur précis. Cela permet aussi d'empêcher un utilisateur non connecté d'accéder à certaines pages ou données privées.
+
+Q3. C'est quoi le uid dans Firebase Auth ?
+R. Le uid est l'identifiant unique généré par Firebase pour chaque utilisateur. Il sert souvent à relier les documents Firestore à leur propriétaire et à écrire des règles de sécurité.
+
+Q4. Quelle est la différence entre l'email et le uid d'un utilisateur ?
+R. L'email peut changer et n'est pas idéal comme clé de sécurité. Le uid est stable et unique, donc il est préférable pour identifier le propriétaire d'un document.
+
+Q5. À quoi sert FirebaseAuth.instance.currentUser ?
+R. currentUser permet de connaître l'utilisateur actuellement connecté. S'il vaut null, cela signifie qu'aucun utilisateur n'est connecté.
+
+Q6. Comment vérifie-t-on si un utilisateur est connecté ?
+R. On vérifie si FirebaseAuth.instance.currentUser est différent de null. Si currentUser est null, l'utilisateur doit être redirigé vers la page de connexion.
+
+Q7. Pourquoi faut-il faire await Firebase.initializeApp() au démarrage ?
+R. Firebase doit être initialisé avant d'utiliser Auth, Firestore ou Storage. Sans initialisation, l'application ne peut pas communiquer correctement avec le projet Firebase.
+
+Q8. À quoi sert la connexion Google dans une application Flutter ?
+R. Elle permet à l'utilisateur de se connecter avec son compte Google au lieu de créer un compte manuellement. Firebase Auth récupère ensuite les informations de connexion et crée une session Firebase.
+
+Q9. Que fait signOut() ?
+R. signOut() déconnecte l'utilisateur de Firebase. Si l'application utilise GoogleSignIn, il faut aussi déconnecter Google pour éviter que la session reste active.
+
+Q10. Pourquoi garde-t-on souvent une page de connexion et une page d'inscription séparées ?
+R. La page de connexion sert aux utilisateurs existants, tandis que la page d'inscription permet de créer un nouveau compte. Cela rend l'application plus claire et facilite la gestion des erreurs.
+
+Q11. À quoi sert authStateChanges() ?
+R. authStateChanges() est un Stream qui avertit l'application quand l'état de connexion change. Il permet d'afficher automatiquement la bonne page selon que l'utilisateur est connecté ou non.
+
+Q12. Pourquoi ne faut-il pas faire confiance seulement à l'interface pour protéger les données ?
+R. L'interface peut cacher des boutons ou des pages, mais elle ne bloque pas réellement les accès au serveur. Les vraies protections doivent être dans les règles Firebase.
+
+====================================================================
+2. FIRESTORE — BASE DE DONNÉES
+====================================================================
+
+Q13. Qu'est-ce que Cloud Firestore ?
+R. Cloud Firestore est une base de données NoSQL de Firebase. Les données sont organisées en collections, documents et champs.
+
+Q14. Quelle est la différence entre une collection et un document ?
+R. Une collection regroupe plusieurs documents. Un document contient des champs, par exemple nom, prenom, complete ou uid.
+
+Q15. Donne un exemple de structure Firestore.
+R. On peut avoir une collection taches, avec un document par tâche. Chaque document peut contenir un titre, une description, un booléen complete et l'uid de l'utilisateur propriétaire.
+
+Q16. Pourquoi associer les données à un utilisateur ?
+R. Cela permet de savoir à qui appartient chaque document. Ensuite, on peut afficher seulement les données de l'utilisateur connecté et empêcher les autres de les modifier.
+
+Q17. À quoi sert le champ uid dans un document Firestore ?
+R. Le champ uid sert à identifier le propriétaire du document. On l'utilise dans les requêtes et dans les règles de sécurité pour contrôler l'accès.
+
+Q18. Quelle est la différence entre get() et snapshots() ?
+R. get() lit les données une seule fois. snapshots() retourne un Stream qui met automatiquement l'interface à jour quand les données changent.
+
+Q19. À quoi sert set() dans Firestore ?
+R. set() crée ou remplace un document complet. Il est utile quand on veut enregistrer un objet avec toutes ses propriétés.
+
+Q20. À quoi sert update() dans Firestore ?
+R. update() modifie seulement certains champs d'un document existant. Par exemple, on peut changer complete de false à true sans remplacer tout le document.
+
+Q21. À quoi sert add() dans Firestore ?
+R. add() crée un nouveau document avec un identifiant automatique. C'est utile quand l'id n'a pas besoin d'être choisi par l'application.
+
+Q22. Quelle est la différence entre add() et doc(id).set() ?
+R. add() génère un id automatiquement. doc(id).set() permet de choisir l'id du document, par exemple un matricule ou un uid.
+
+Q23. Pourquoi utiliser withConverter ?
+R. withConverter permet de convertir automatiquement les documents Firestore en objets Dart. Cela évite de manipuler directement des Map partout dans le code.
+
+Q24. Quel est l'avantage d'une classe modèle avec Firestore ?
+R. Une classe modèle donne une structure claire aux données. Elle permet de travailler avec des objets comme Tache, Jeu ou Etudiant au lieu de simples Map.
+
+Q25. À quoi sert fromFirestore ou fromJson ?
+R. Ces méthodes convertissent les données reçues de Firestore ou d'un serveur en objet Dart. Elles servent à transformer un Map en classe utilisable dans l'application.
+
+Q26. À quoi sert toFirestore ou toJson ?
+R. Ces méthodes convertissent un objet Dart en Map pour pouvoir l'envoyer à Firestore ou à un serveur.
+
+Q27. Pourquoi filtrer une collection avec where('uid', isEqualTo: currentUser.uid) ?
+R. Cela permet d'afficher seulement les documents qui appartiennent à l'utilisateur connecté. C'est une protection côté interface, mais elle doit être accompagnée de règles Firebase.
+
+Q28. Pourquoi l'id du document peut être important ?
+R. L'id permet de retrouver, modifier ou supprimer un document précis. Dans certains exercices, l'id peut être le matricule ou le uid de l'utilisateur.
+
+Q29. Qu'est-ce qu'une donnée hardcodée ?
+R. Une donnée hardcodée est une valeur écrite directement dans le code. Elle peut être utile pour tester, mais dans une vraie application on préfère souvent utiliser des données venant de l'utilisateur ou de la base.
+
+====================================================================
+3. CONTRÔLE D'ACCÈS FIREBASE
+====================================================================
+
+Q30. Qu'est-ce que le contrôle d'accès ?
+R. Le contrôle d'accès consiste à décider qui a le droit de lire, créer, modifier ou supprimer des données. Dans Firebase, il se fait avec l'authentification, les vérifications dans l'application et les règles de sécurité.
+
+Q31. Comment le contrôle d'accès est-il mis en place dans une application Firebase ?
+R. On connecte l'utilisateur avec Firebase Auth, on associe ses données à son uid, puis on écrit des règles Firebase pour permettre seulement au propriétaire d'accéder à ses documents.
+
+Q32. Qu'est-ce que le contrôle d'accès dans le TP3 du cours ?
+R. Dans le TP3, le contrôle d'accès sert à empêcher un utilisateur de consulter ou modifier les tâches des autres. Les documents sont liés à l'utilisateur connecté et les règles Firebase vérifient l'identité avec request.auth.uid.
+
+Q33. Pourquoi le contrôle d'accès est important ?
+R. Il protège les données privées des utilisateurs. Sans contrôle d'accès, un utilisateur pourrait lire ou modifier des documents qui ne lui appartiennent pas.
+
+Q34. Quelle est la différence entre authentification et autorisation ?
+R. L'authentification vérifie qui est l'utilisateur. L'autorisation vérifie ce que cet utilisateur a le droit de faire.
+
+Q35. Pourquoi vérifier request.auth != null dans les règles ?
+R. Cela permet de refuser les accès aux utilisateurs non connectés. Seuls les utilisateurs authentifiés peuvent lire ou écrire selon les règles définies.
+
+Q36. Pourquoi comparer request.auth.uid avec un champ uid du document ?
+R. Cette comparaison permet de vérifier que l'utilisateur connecté est bien le propriétaire du document. Si les uid ne correspondent pas, l'accès est refusé.
+
+Q37. Quelle est la limite du contrôle d'accès seulement dans Flutter ?
+R. Un utilisateur pourrait contourner l'application et faire des requêtes directement vers Firebase. Les règles Firebase sont donc nécessaires pour protéger les données côté serveur.
+
+Q38. Que peut faire l'application côté client pour aider au contrôle d'accès ?
+R. L'application peut cacher les boutons, filtrer les données avec where et rediriger les utilisateurs non connectés. Mais la vraie sécurité reste dans les règles Firebase.
+
+Q39. Comment empêcher un utilisateur de modifier le document d'un autre ?
+R. Dans les règles, on vérifie que request.auth.uid correspond au uid du document existant ou du document envoyé. Si ce n'est pas son document, la modification est refusée.
+
+Q40. Que signifie "owner" ou "propriétaire" d'un document ?
+R. Le propriétaire est l'utilisateur qui a créé ou qui possède le document. On l'identifie généralement avec un champ uid dans le document.
+
+Q41. Comment répondre à une question sur le contrôle d'accès en 2 à 4 lignes ?
+R. Le contrôle d'accès sert à protéger les données selon l'utilisateur connecté. Dans Firebase, on utilise Firebase Auth pour connaître l'utilisateur, on associe les documents à son uid et les règles Firebase autorisent seulement les actions permises.
+
+====================================================================
+4. RÈGLES D'ACCÈS FIREBASE / SECURITY RULES
+====================================================================
+
+Q42. À quoi servent les règles Firebase ?
+R. Les règles Firebase définissent les permissions de lecture et d'écriture dans Firestore ou Storage. Elles sont exécutées côté serveur et protègent les données même si l'application est contournée.
+
+Q43. Que veut dire allow read, write: if request.auth != null ?
+R. Cela veut dire que seuls les utilisateurs connectés peuvent lire et écrire. Les utilisateurs anonymes ou non connectés sont refusés.
+
+Q44. Pourquoi les règles Firebase sont plus importantes que les vérifications dans Flutter ?
+R. Flutter fonctionne côté client et peut être modifié ou contourné. Les règles Firebase sont appliquées par Firebase lui-même et sont donc la vraie barrière de sécurité.
+
+Q45. Qu'est-ce que request.auth.uid ?
+R. request.auth.uid est le uid de l'utilisateur connecté qui fait la requête. Il est utilisé dans les règles pour vérifier l'identité de l'utilisateur.
+
+Q46. Qu'est-ce que resource.data ?
+R. resource.data représente les données déjà existantes du document dans Firestore. On l'utilise souvent pour vérifier le propriétaire actuel d'un document.
+
+Q47. Qu'est-ce que request.resource.data ?
+R. request.resource.data représente les nouvelles données que l'utilisateur veut écrire. On l'utilise pour valider les champs envoyés lors d'une création ou d'une modification.
+
+Q48. Pourquoi valider les champs dans les règles ?
+R. La validation empêche les utilisateurs d'envoyer des champs interdits ou des valeurs invalides. Cela protège la structure de la base de données.
+
+Q49. À quoi sert hasOnly dans les règles ?
+R. hasOnly permet de limiter les champs acceptés dans un document. Par exemple, on peut autoriser seulement titre, description, complete et uid.
+
+Q50. Quelle règle simple permet de protéger les documents par utilisateur ?
+R. Une règle typique vérifie que request.auth.uid est égal au champ uid du document. Ainsi, chaque utilisateur peut seulement accéder à ses propres données.
+
+Q51. Quelle est la différence entre read, create, update et delete ?
+R. read permet de lire, create de créer, update de modifier et delete de supprimer. On peut donner des conditions différentes pour chaque action.
+
+Q52. Pourquoi séparer create et update dans les règles ?
+R. À la création, on vérifie les données envoyées avec request.resource.data. À la modification, on peut vérifier l'ancien document avec resource.data et les nouvelles valeurs avec request.resource.data.
+
+Q53. Pourquoi une règle trop ouverte est dangereuse ?
+R. Une règle trop ouverte peut permettre à n'importe qui de lire ou modifier toutes les données. Cela peut causer des fuites ou des suppressions de données.
+
+Q54. Donne une réponse courte sur les règles d'accès.
+R. Les règles d'accès Firebase servent à sécuriser Firestore et Storage. Elles vérifient l'utilisateur connecté, les données envoyées et les permissions avant d'autoriser une lecture ou une écriture.
+
+====================================================================
+5. FIREBASE STORAGE
+====================================================================
+
+Q55. Qu'est-ce que Firebase Storage ?
+R. Firebase Storage permet d'enregistrer des fichiers comme des images, vidéos ou documents. Il est souvent utilisé avec Firestore, qui garde les informations et l'URL du fichier.
+
+Q56. Quelle est la différence entre Firestore et Storage ?
+R. Firestore stocke des données structurées comme des textes, nombres et booléens. Storage stocke des fichiers comme des images ou des PDF.
+
+Q57. Pourquoi stocker l'URL d'une image dans Firestore ?
+R. Storage conserve le fichier, mais Firestore peut garder son downloadURL avec les autres informations. Cela permet d'afficher facilement l'image dans l'application.
+
+Q58. À quoi sert putFile() ?
+R. putFile() envoie un fichier local vers Firebase Storage. Après l'envoi, on peut récupérer l'URL du fichier avec getDownloadURL().
+
+Q59. À quoi sert getDownloadURL() ?
+R. getDownloadURL() retourne une URL permettant d'accéder au fichier stocké. Cette URL peut ensuite être enregistrée dans Firestore ou utilisée dans Image.network.
+
+Q60. Pourquoi organiser les fichiers Storage avec des dossiers par uid ?
+R. Cela permet de séparer les fichiers de chaque utilisateur. C'est aussi plus facile d'écrire des règles de sécurité basées sur request.auth.uid.
+
+Q61. Comment sécuriser Firebase Storage ?
+R. On écrit des règles qui vérifient request.auth et le chemin du fichier. Par exemple, un utilisateur peut seulement écrire dans un dossier qui correspond à son uid.
+
+Q62. Pourquoi il faut gérer les erreurs d'upload ?
+R. L'envoi d'un fichier peut échouer si le réseau coupe ou si l'utilisateur n'a pas les droits. L'application doit afficher un message clair et redevenir utilisable.
+
+Q63. Quelle réponse donner sur Storage en développement ?
+R. Firebase Storage sert à enregistrer des fichiers, tandis que Firestore garde les informations reliées. Dans une application, on envoie le fichier, on récupère son URL, puis on l'enregistre dans la base de données.
+
+====================================================================
+6. STREAM FIREBASE
+====================================================================
+
+Q64. Qu'est-ce qu'un Stream en Flutter/Firebase ?
+R. Un Stream est une source de données qui peut envoyer plusieurs valeurs dans le temps. Avec Firebase, il permet de recevoir automatiquement les changements de la base de données.
+
+Q65. À quoi sert StreamBuilder ?
+R. StreamBuilder construit l'interface selon l'état d'un Stream. Il peut afficher un chargement, une erreur, aucune donnée ou la liste des données reçues.
+
+Q66. Quelle est la différence entre FutureBuilder et StreamBuilder ?
+R. FutureBuilder attend une seule réponse, comme un get(). StreamBuilder écoute continuellement les changements, comme snapshots().
+
+Q67. Pourquoi utiliser snapshots() avec Firestore ?
+R. snapshots() permet d'écouter les documents en temps réel. Si une donnée est ajoutée, modifiée ou supprimée, l'interface se met à jour automatiquement.
+
+Q68. Que représente snapshot.hasData ?
+R. snapshot.hasData indique que le Stream a reçu des données. On peut alors lire snapshot.data pour construire l'interface.
+
+Q69. Que représente snapshot.hasError ?
+R. snapshot.hasError indique qu'une erreur est survenue pendant l'écoute du Stream. L'application devrait afficher un message d'erreur.
+
+Q70. Pourquoi afficher CircularProgressIndicator dans un StreamBuilder ?
+R. On l'affiche pendant que les données sont en chargement. Cela donne un indicateur visuel à l'utilisateur.
+
+Q71. Comment afficher une liste Firestore en temps réel ?
+R. On utilise une requête Firestore avec snapshots(), puis un StreamBuilder. Les documents reçus servent ensuite à construire un ListView.
+
+Q72. Pourquoi le Stream est utile dans une application de tâches ?
+R. Il permet de voir immédiatement les changements dans la liste sans recharger manuellement. Quand une tâche est ajoutée ou complétée, l'écran se met à jour.
+
+Q73. Quelle réponse donner sur Stream Firebase ?
+R. Un Stream Firebase permet d'écouter les données en temps réel. Avec StreamBuilder, l'interface se reconstruit automatiquement quand Firestore envoie une nouvelle version des données.
+
+====================================================================
+7. HERO
+====================================================================
+
+Q74. Qu'est-ce que le widget Hero ?
+R. Hero est un widget Flutter qui crée une animation entre deux pages. Un élément semble voler de la première page vers la deuxième page.
+
+Q75. À quoi sert le tag dans un Hero ?
+R. Le tag permet à Flutter de savoir quels deux widgets Hero correspondent entre les pages. Les deux Hero doivent avoir le même tag pour que l'animation fonctionne.
+
+Q76. Quand utilise-t-on Hero ?
+R. On l'utilise souvent pour animer une image, une carte ou un élément de liste vers une page de détail. Cela rend la navigation plus fluide et visuelle.
+
+Q77. Quelle erreur fréquente peut arriver avec Hero ?
+R. Si deux Hero ont le même tag sur la même page, Flutter peut lancer une erreur. Chaque tag doit être unique dans un même écran.
+
+Q78. Quelle réponse donner sur Hero ?
+R. Hero permet d'animer un widget partagé entre deux écrans. Les deux widgets doivent avoir le même tag pour que Flutter crée la transition visuelle pendant la navigation.
+
+====================================================================
+8. HTTP, JSON, DIO ET ERREURS
+====================================================================
+
+Q79. Qu'est-ce qu'une requête HTTP GET ?
+R. Une requête GET sert à demander des données à un serveur. Dans Flutter, on peut l'envoyer avec Dio et récupérer la réponse dans response.data.
+
+Q80. À quoi sert Dio ?
+R. Dio est une librairie Flutter utilisée pour faire des requêtes HTTP. Elle permet d'appeler un serveur, d'envoyer des paramètres et de récupérer du JSON.
+
+Q81. Qu'est-ce que JSON ?
+R. JSON est un format de données utilisé pour échanger des informations entre un serveur et une application. Il ressemble à une Map avec des clés et des valeurs.
+
+Q82. Pourquoi créer une classe de transfert pour le JSON ?
+R. Une classe de transfert permet de transformer le JSON en objet Dart. Cela rend le code plus clair et évite d'utiliser directement response.data partout.
+
+Q83. À quoi sert fromJson dans une classe Dart ?
+R. fromJson prend une Map reçue du serveur et crée un objet Dart. C'est la méthode utilisée pour convertir la réponse JSON en modèle.
+
+Q84. Pourquoi utiliser try/catch avec Dio ?
+R. Une requête réseau peut échouer si le serveur est fermé, si l'URL est mauvaise ou si le serveur retourne une erreur. try/catch permet d'afficher un SnackBar au lieu de faire planter l'application.
+
+Q85. Quelle est la différence entre une erreur 400 et une erreur réseau ?
+R. Une erreur 400 signifie que le serveur a reçu la requête mais que les données sont invalides. Une erreur réseau signifie que l'application n'arrive pas à communiquer avec le serveur.
+
+Q86. Pourquoi afficher un SnackBar en cas d'erreur ?
+R. Le SnackBar informe l'utilisateur qu'il y a un problème sans fermer l'application. Le message doit être clair et en français.
+
+Q87. Pourquoi utiliser setState après une requête Dio ?
+R. setState indique à Flutter que les données ont changé. L'interface est alors reconstruite pour afficher la réponse reçue du serveur.
+
+Q88. Pourquoi un objet reçu du serveur est souvent nullable au début ?
+R. Au lancement de l'application, aucune requête n'a encore été faite. L'objet peut donc être null jusqu'à ce que le serveur retourne une réponse.
+
+Q89. Pourquoi valider les champs avant d'appeler Dio ?
+R. Cela évite d'envoyer une requête avec des champs vides ou invalides. L'application peut afficher un SnackBar avant même de contacter le serveur.
+
+Q90. Que veut dire 10.0.2.2 dans l'émulateur Android ?
+R. 10.0.2.2 est l'adresse utilisée par l'émulateur Android pour rejoindre le localhost de l'ordinateur. On l'utilise pour appeler un serveur lancé sur le PC.
+
+Q91. Pourquoi localhost ne marche pas toujours dans l'émulateur ?
+R. Dans l'émulateur, localhost représente l'émulateur lui-même, pas l'ordinateur. Pour rejoindre le serveur du PC, on utilise 10.0.2.2.
+
+Q92. Quelle réponse donner sur HTTP JSON et erreurs ?
+R. L'application envoie une requête HTTP avec Dio, récupère le JSON et le convertit en objet avec fromJson. Les erreurs réseau ou serveur sont gérées avec try/catch et affichées dans un SnackBar clair.
+
+====================================================================
+9. QUESTIONS FORMATIVES POSSIBLES — RÉPONSES PRÊTES À COPIER
+====================================================================
+
+Q93. Qu'est-ce que le contrôle d'accès, et comment est-il mis en place dans le TP3 du cours d'applications mobiles avancées ?
+R. Le contrôle d'accès sert à limiter les actions selon l'utilisateur connecté. Dans le TP3, Firebase Auth identifie l'utilisateur, les données Firestore sont associées à son uid, puis les règles Firebase empêchent de lire ou modifier les données des autres.
+
+Q94. Explique la différence entre Firebase Auth et Firestore.
+R. Firebase Auth sert à connecter et identifier les utilisateurs. Firestore sert à stocker les données de l'application, comme les tâches, les jeux ou les étudiants.
+
+Q95. Explique pourquoi on utilise request.auth.uid dans les règles Firebase.
+R. request.auth.uid permet de connaître l'utilisateur qui fait la requête. On peut le comparer au uid du document pour autoriser seulement le propriétaire à lire ou modifier ses données.
+
+Q96. Explique pourquoi withConverter est utile avec Firestore.
+R. withConverter permet de convertir automatiquement les documents Firestore en objets Dart et inversement. Le code devient plus propre, plus typé et plus facile à maintenir.
+
+Q97. Explique pourquoi on utilise un StreamBuilder avec Firestore.
+R. StreamBuilder permet d'afficher des données provenant d'un Stream Firestore. Quand les données changent dans la base, l'interface se met à jour automatiquement.
+
+Q98. Explique la différence entre get() et snapshots().
+R. get() récupère les données une seule fois. snapshots() écoute les données en continu et envoie une nouvelle valeur chaque fois que la base change.
+
+Q99. Explique pourquoi les règles Firebase sont nécessaires même si l'application cache les boutons.
+R. Cacher un bouton protège seulement l'interface, pas la base de données. Un utilisateur pourrait contourner l'application, donc les règles Firebase doivent bloquer les accès non autorisés côté serveur.
+
+Q100. Explique le rôle de Firebase Storage dans une application mobile.
+R. Firebase Storage sert à sauvegarder des fichiers comme des images. Après l'envoi, on récupère l'URL du fichier et on peut la stocker dans Firestore pour l'afficher plus tard.
+
+Q101. Explique le fonctionnement d'une requête Dio dans Flutter.
+R. L'application appelle une URL avec Dio, attend la réponse du serveur, récupère response.data, puis convertit le JSON en objet Dart. Ensuite, setState met à jour l'interface.
+
+Q102. Explique comment gérer une erreur serveur dans une application Flutter.
+R. On place la requête dans un try/catch. Si le serveur retourne une erreur ou ne répond pas, on affiche un SnackBar clair en français et on évite que l'application plante.
+
+Q103. Explique à quoi sert Hero dans Flutter.
+R. Hero sert à animer un widget entre deux pages, par exemple une image d'une liste vers une page de détail. Les deux widgets Hero doivent partager le même tag.
+
+Q104. Explique pourquoi on associe un document Firestore à un uid.
+R. Associer un document à un uid permet de savoir quel utilisateur en est propriétaire. Cela sert à filtrer les données affichées et à écrire des règles de sécurité.
+
+Q105. Explique comment mettre à jour un champ dans Firestore.
+R. On récupère la référence du document, puis on utilise update() avec le champ à modifier. Par exemple, on peut mettre complete à true sans remplacer tout le document.
+
+Q106. Explique comment afficher seulement les données de l'utilisateur connecté.
+R. On utilise currentUser.uid et une requête Firestore avec where('uid', isEqualTo: uid). Les règles Firebase doivent aussi vérifier que l'utilisateur a le droit de lire ces données.
+
+Q107. Explique la différence entre côté client et côté serveur dans la sécurité Firebase.
+R. Le côté client correspond au code Flutter, qui peut être contourné. Le côté serveur correspond aux règles Firebase, qui sont appliquées directement par Firebase et protègent réellement les données.
+
+Q108. Explique pourquoi il faut un indicateur de chargement pendant une requête.
+R. Une requête peut prendre du temps, donc l'utilisateur doit voir que l'application travaille. Cela évite aussi qu'il appuie plusieurs fois sur le bouton pendant l'attente.
+
+Q109. Explique pourquoi on rend l'interface fonctionnelle après une attente serveur.
+R. Après la réponse ou l'erreur, l'application doit réactiver les boutons et retirer le chargement. Sinon, l'utilisateur peut rester bloqué même si la requête est terminée.
+
+Q110. Explique pourquoi un document Firestore peut utiliser le matricule comme id.
+R. Si chaque étudiant possède un matricule unique, il peut servir d'id de document. Cela permet de retrouver directement le document avec doc(matricule).
+
+====================================================================
+10. MINI-RÉPONSES DE 2 À 4 LIGNES POUR L'EXAMEN
+====================================================================
+
+1) Contrôle d'accès :
+Le contrôle d'accès permet de déterminer qui peut lire ou modifier les données. Dans Firebase, il est fait avec Firebase Auth, le uid de l'utilisateur et les règles de sécurité Firestore/Storage.
+
+2) Firebase Auth :
+Firebase Auth sert à connecter l'utilisateur et à l'identifier avec un uid unique. Ce uid est ensuite utilisé pour relier les données à leur propriétaire.
+
+3) Firestore :
+Firestore est une base NoSQL organisée en collections et documents. On y stocke les données de l'application, souvent avec un champ uid pour savoir à quel utilisateur elles appartiennent.
+
+4) Règles Firebase :
+Les règles Firebase protègent les données côté serveur. Elles vérifient request.auth, request.auth.uid et les données envoyées avant d'autoriser une lecture ou une écriture.
+
+5) Storage :
+Firebase Storage sert à stocker des fichiers comme des images. On envoie le fichier, on récupère son downloadURL, puis on peut enregistrer cette URL dans Firestore.
+
+6) StreamBuilder :
+StreamBuilder écoute un Stream et reconstruit l'interface quand une nouvelle donnée arrive. Avec Firestore snapshots(), il permet un affichage en temps réel.
+
+7) Hero :
+Hero crée une animation entre deux pages pour un widget partagé. Les deux widgets doivent avoir le même tag pour que la transition fonctionne.
+
+8) Dio et JSON :
+Dio envoie une requête HTTP au serveur et récupère une réponse JSON. On convertit ce JSON en objet Dart avec fromJson, puis setState met à jour l'affichage.
+
+9) Erreurs HTTP :
+Les erreurs réseau ou serveur doivent être gérées avec try/catch. L'application doit afficher un SnackBar clair en français au lieu de planter.
+
+10) get vs snapshots :
+get() lit les données une seule fois. snapshots() garde une écoute active et met l'interface à jour quand Firestore change.
+
+====================================================================
+11. MOTS-CLÉS À PLACER DANS TES RÉPONSES
+====================================================================
+
+Firebase Auth : utilisateur connecté, uid, currentUser, signIn, signOut, authStateChanges.
+Firestore : collection, document, champ, get, set, update, add, delete, withConverter.
+Contrôle d'accès : propriétaire, uid, request.auth.uid, règles, lecture, écriture, sécurité.
+Storage : fichier, image, putFile, getDownloadURL, chemin, uid, règles Storage.
+Stream : snapshots, StreamBuilder, temps réel, snapshot.hasData, snapshot.hasError.
+Hero : animation, navigation, tag, page de détail.
+HTTP/Dio : GET, URL, response.data, JSON, fromJson, try/catch, SnackBar, 400, erreur réseau.
+
+====================================================================
+12. PLAN RAPIDE POUR RÉPONDRE À UNE QUESTION À DÉVELOPPEMENT
+====================================================================
+
+Étape 1 : Définis le concept en une phrase.
+Étape 2 : Explique comment il est utilisé dans l'application ou le TP.
+Étape 3 : Donne un exemple précis : uid, règle, StreamBuilder, Dio, etc.
+Étape 4 : Termine avec le but : sécurité, affichage, temps réel ou navigation.
+
+Exemple de structure :
+"Le contrôle d'accès sert à ____. Dans le TP, il est mis en place avec ____. On utilise ____ pour vérifier ____. Cela permet de ____."
+
