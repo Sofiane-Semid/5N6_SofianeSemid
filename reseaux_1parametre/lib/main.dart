@@ -41,6 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
       var response = await Dio().get(
         'http://10.0.2.2:8080/exam/suite-carre/${positionController.text}',
       );
+      suiteCarreResultat = SuiteCarreResultat.fromJson(response.data);
       print(response);
       setState(() {
         suiteCarreResultat = SuiteCarreResultat.fromJson(response.data);
