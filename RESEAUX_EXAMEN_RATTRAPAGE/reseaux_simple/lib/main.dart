@@ -35,8 +35,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   TextEditingController distanceControlleur = TextEditingController();
   TextEditingController poidsControlleur = TextEditingController();
-
-  int reponse = -1;
+  // c'Est pour requete trws simple double
+  //int reponse = -1;
   Cinema? cinema;
   Livraison? livraison;
 
