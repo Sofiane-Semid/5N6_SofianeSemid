@@ -30,23 +30,48 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
   TextEditingController dividendeControlleur = TextEditingController();
   TextEditingController diviseurControlleur = TextEditingController();
-  int reponse = -1;
+
+  String resultat = "";
+  String message = "";
 
   void getHttp() async {
     try {
       var response = await Dio().get(
         'https://examen-final-a24.azurewebsites.net/Exam2024/Division/${dividendeControlleur.text}/${diviseurControlleur.text}',
       );
-      print(response);
-      reponse = response.data;
-      setState(() {});
-    } catch (e) {
-      print(e);
+
+      print('${response.data}');
+      print(response.statusCode);
+
+      resultat = response.data['resultat'].toString();
+
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Erreur reseau')));
+      ).showSnackBar(SnackBar(content: Text(resultat)));
+
+      setState(() {});
+
+    }
+    on DioException catch(e) {
+      if(e.response?.statusCode == 400){
+
+        print(e.response?.statusCode);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(e.response!.data.toString()))
+        );
+      }
+      else {
+        print(e.response?.statusCode);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Impossible de communiquer avec le serveur"))
+        );
+      }
+
     }
   }
 

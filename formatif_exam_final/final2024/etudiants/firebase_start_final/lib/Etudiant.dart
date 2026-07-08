@@ -1,35 +1,32 @@
 import 'package:flutter/material.dart';
 
-class Etudiant extends StatelessWidget {
+
+// NE SERT A RIEN sauf quand il demande avec withconverter
+
+class Etudiant {
   final String nom;
   final String prenom;
   final bool complete;
 
-  const Etudiant({
-    super.key,
+  Etudiant({
     required this.nom,
     required this.prenom,
-    this.complete = false,
-
+    required this.complete,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("l'étudiant"),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Prenom : $prenom"),
-            Text("Nom : $nom"),
-            Text("Complété : $complete")
-          ],
-        ),
-      ),
+  factory Etudiant.fromJson(Map<String, dynamic> json) {
+    return Etudiant(
+      nom: json['nom'],
+      prenom: json['prenom'],
+      complete: json['complete'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'nom': nom,
+      'prenom': prenom,
+      'complete': complete,
+    };
   }
 }

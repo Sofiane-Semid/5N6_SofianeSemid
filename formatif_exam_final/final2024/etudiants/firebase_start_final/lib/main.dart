@@ -56,6 +56,47 @@ class _MyHomePageState extends State<MyHomePage> {
   //   }
   // }
 
+  //.update : Ça sert à modifier un ou plusieurs champs d’un document existant.
+  //.get : sert a obtenir les infos d'un étudiant, lis le document une fois
+
+  //.set : Ça sert à créer ou remplacer un document.
+   /* await etudiantsCollection.doc(controller.text).set({
+   'nom': 'Semid',
+   'prenom': 'Sofiane',
+   'complete': false,
+
+   Tu peux aussi faire un set sans tout remplacer avec merge: true :
+
+   await etudiantsCollection.doc(controller.text).set({
+  'complete': true,
+}, SetOptions(merge: true));
+   }); */
+
+  //.delete : Ça supprime complètement l’étudiant dans Firestore.
+  //await etudiantsCollection.doc(controller.text).delete();
+
+  //.snapshots : Si le document change dans Firestore, ton application se met à jour automatiquement.
+  /*StreamBuilder(
+  stream: etudiantsCollection.doc(controller.text).snapshots(),
+  builder: (context, snapshot) {
+    if (!snapshot.hasData) {
+      return CircularProgressIndicator();
+    }
+
+    var data = snapshot.data!.data() as Map<String, dynamic>;
+
+    return Text(data['nom']);
+  },
+) */
+
+  //.withConverter : Ça sert à convertir automatiquement les documents Firestore en objets Dart. Psr exemple crée des jeux
+  /* final etudiantsCollection =
+    FirebaseFirestore.instance.collection('etudiants').withConverter<Etudiant>(
+  fromFirestore: (snapshot, _) => Etudiant.fromJson(snapshot.data()!),
+  toFirestore: (etudiant, _) => etudiant.toJson(),
+);*/
+
+
   void getEtudiants() async{
     CollectionReference etudiantsCollection = FirebaseFirestore.instance.collection('etudiants');
     var resultats = await etudiantsCollection.doc(controller.text).get();
