@@ -49,22 +49,64 @@ class _MyHomePageState extends State<MyHomePage> {
     await Firebase.initializeApp();
   }
 
-  void addJeux() async {
+                               // Roue de secours si marche pas, pour creer un truc et le recuperer
+  /*void addJeux() async {
     CollectionReference jeuxCollection = FirebaseFirestore.instance.collection('Jeux');
     jeuxCollection.add({
-      'Nom' : 'Gta 1',
+      'Nom' : 'Gta 5',
       'Ventes' : 5
 
     });
   }
   var jeuDocs;
-  
   void getJeux() async {
     CollectionReference jeuxCollection = FirebaseFirestore.instance.collection('Jeux');
     var resultats = await jeuxCollection.get();
     jeuDocs = resultats.docs;
-    
+
     setState((){});
+  }*/
+
+  final CollectionReference<Map<String, dynamic>> jeuCollection =
+  FirebaseFirestore.instance.collection('mdr');
+
+  List<QueryDocumentSnapshot> jeuDocs = [];
+
+  Future<void> addJeux() async {
+    try {
+      CollectionReference jeuxCollection =
+      FirebaseFirestore.instance.collection('mdr');
+
+      await jeuxCollection.add({
+        'Nom': 'Gta 3',
+        'Ventes': 5,
+      });
+
+      print("Jeu ajouté");
+
+      // Pour rafraîchir la liste après l'ajout
+      await getJeux();
+
+    } catch (e) {
+      print("Erreur lors de l'ajout du jeu : $e");
+    }
+  }
+
+  Future<void> getJeux() async {
+    try {
+      CollectionReference jeuxCollection =
+      FirebaseFirestore.instance.collection('mdr');
+
+      QuerySnapshot resultats = await jeuxCollection.get();
+
+      setState(() {
+        jeuDocs = resultats.docs;
+      });
+
+      print("${jeuDocs.length} jeux récupérés");
+    } catch (e) {
+      print("Erreur lors de la récupération des jeux : $e");
+    }
   }
 
 
@@ -92,7 +134,29 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
             Expanded(
-                child: ListView(
+                child:ListView.builder(
+                  itemCount: jeuDocs.length,
+                  itemBuilder: (context, index) {
+                    final data = jeuDocs[index].data() as Map<String, dynamic>;
+
+                    return ListTile(
+                      title: Text(data['Nom']),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailJeuPage(
+                              nom: data['Nom'],
+                              ventes: data['Ventes'],
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+                                 // Sa va avec le code en haut roue de secours
+              /*ListView(
                   children:
                 (jeuDocs != null)?
                 jeuDocs.map<Widget>((j) => ElevatedButton(
@@ -107,8 +171,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                  )).toList()
                     : [Text('rien')]
-                )
-            )
+                )*/
+            ),
+
           ],
         ),
       ),
