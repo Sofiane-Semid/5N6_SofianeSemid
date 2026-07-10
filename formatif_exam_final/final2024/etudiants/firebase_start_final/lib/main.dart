@@ -160,8 +160,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  final CollectionReference<Map<String, dynamic>> matriculeCollection =
-  FirebaseFirestore.instance.collection('etudiants');
+  /*final CollectionReference<Map<String, dynamic>> matriculeCollection =
+  FirebaseFirestore.instance.collection('etudiants');*/
 
   String nom = "";
   String prenom = "";
