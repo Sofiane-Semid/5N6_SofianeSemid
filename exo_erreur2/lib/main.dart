@@ -56,13 +56,65 @@ class _MyHomePageState extends State<MyHomePage> {
 
     }
     on DioException catch(e) {
-      if(e.response?.statusCode == 400){
 
+      // l’utilisateur clique sur le bouton sans écrire le dividende ou le diviseur.
+      if (dividendeControlleur.text.isEmpty || diviseurControlleur.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Veuillez remplir les deux champs")),
+        );
+        return;
+      }
+
+
+      int? dividende = int.tryParse(dividendeControlleur.text);
+      int? diviseur = int.tryParse(diviseurControlleur.text);
+      // l’utilisateur écrit du texte au lieu d’un nombre
+      if (dividende == null || diviseur == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Veuillez entrer seulement des nombres")),
+        );
+        return;
+      }
+
+      //mauvaise URL ou page inexistante, erreur 404
+      // /Exam2024/Divisions/ au lieu de ca /Exam2024/Division/
+      else if (e.response?.statusCode == 404) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("La route demandée n'existe pas")),
+        );
+      }
+
+      // Le serveur ne répond pas
+      if (e.response != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.response!.data.toString())),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Impossible de communiquer avec le serveur"),
+          ),
+        );
+      }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+      if(e.response?.statusCode == 400){
+        //affiche code erreur
         print(e.response?.statusCode);
 
+        //affiche message erreur (optionnel)
+        print("Erreur serveur : ${e.response?.data}");
+
         ScaffoldMessenger.of(context).showSnackBar(
+          // Affiche le message retourné par le serveur, afficher une valeur JSON
             SnackBar(content: Text(e.response!.data.toString()))
         );
+
+        //met a jour la valeur
+        setState(() {
+          resultat = "0";
+        });
       }
       else {
         print(e.response?.statusCode);

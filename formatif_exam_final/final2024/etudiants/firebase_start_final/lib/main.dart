@@ -158,6 +158,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }*/
 
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
   final CollectionReference<Map<String, dynamic>> matriculeCollection =
   FirebaseFirestore.instance.collection('etudiants');
 
@@ -223,6 +225,15 @@ class _MyHomePageState extends State<MyHomePage> {
               Text("Nom : $nom"),
               Text("Prénom : $prenom"),
               Text("Complété : $complete"),
+
+          //Si l’énoncé dit bouton / récupérer / chercher une fois → get().
+
+          /////////////////////////////////////////////////////////////////////////////////////////
+
+           //Si l’énoncé dit temps réel / automatiquement / mise à jour directe → snapshots() + StreamBuilder.
+
+              // StreamBuilder : La liste doit se mettre à jour automatiquement quand Firestore change.
+
           /*StreamBuilder(
             stream: matriculeCollection.doc("6229260").snapshots(),
             builder: (context, snapshot) {

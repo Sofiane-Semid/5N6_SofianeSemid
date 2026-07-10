@@ -48,6 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initFirebase() async{
     await Firebase.initializeApp();
   }
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                                // Roue de secours si marche pas, pour creer un truc et le recuperer
   /*void addJeux() async {
@@ -66,6 +67,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
     setState((){});
   }*/
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   final CollectionReference<Map<String, dynamic>> jeuCollection =
   FirebaseFirestore.instance.collection('mdr');
@@ -155,6 +158,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     );
                   },
                 ),
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
                                  // Sa va avec le code en haut roue de secours
               /*ListView(
                   children:
